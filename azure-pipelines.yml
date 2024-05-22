@@ -1,0 +1,43 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '16.x' # Use the Node.js version appropriate for your project
+  displayName: 'Install Node.js'
+
+- script: |
+    echo "Starting npm install..."
+    npm install
+    echo "Finished npm install."
+    echo "Starting npm run build..."
+    npm run build
+    echo "Finished npm run build."
+  displayName: 'Install dependencies and build'
+  continueOnError: false
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: 'build'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/webapp'
+  displayName: 'Copy files to staging directory'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: '$(Build.ArtifactStagingDirectory)/webapp'
+    artifactName: 'webapp'
+  displayName: 'Publish build artifacts'
+
+- task: AzureStaticWebApp@0
+  inputs:
+    azure_static_web_apps_api_token: $(AzureStaticWebAppApiToken) # Add this token as a secret in your pipeline
+    app_location: '/' # Root of the React app
+    output_location: 'build' # Location of the build output
+  displayName: 'Deploy to Azure Static Web Apps'
