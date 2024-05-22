@@ -23,7 +23,7 @@ steps:
 - task: NodeTool@0
   inputs:
 <<<<<<< HEAD
-    versionSpec: '16.x' # Use the Node.js version appropriate for your project
+    versionSpec: '14.x' # Use the Node.js version appropriate for your project
   displayName: 'Install Node.js'
 
 - script: |
